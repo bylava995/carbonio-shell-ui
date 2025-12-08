@@ -135,15 +135,27 @@ const ShellPrimaryBar = (): React.JSX.Element | null => {
 
 	const primaryBarItems = useMemo(
 		() =>
-			map(primaryBarViews, (view) =>
-				view.visible ? (
+			map(
+				filter(primaryBarViews, (view) => {
+					// Filter out "distribution lists" button
+					const isDistributionLists =
+						(view.label || '').toLowerCase().includes('distribution lists') ||
+						(view.label || '').toLowerCase().includes('distributionlist') ||
+						(view.id || '').toLowerCase().includes('distribution lists') ||
+						(view.id || '').toLowerCase().includes('distributionlist') ||
+						(view.route || '').toLowerCase().includes('distribution lists') ||
+						(view.route || '').toLowerCase().includes('distributionlist');
+
+					return view.visible && !isDistributionLists;
+				}),
+				(view) => (
 					<PrimaryBarElement
 						key={view.id}
 						onClick={(): void => navigate(`/${routesRef.current[view.id]}`)}
 						view={view}
 						active={activeRoute?.id === view.id}
 					/>
-				) : null
+				)
 			),
 		[navigate, activeRoute?.id, primaryBarViews]
 	);
