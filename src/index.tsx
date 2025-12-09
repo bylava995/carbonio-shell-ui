@@ -50,7 +50,7 @@ const hideFindSharesButton = (): void => {
 	// Helper function to hide button aggressively
 	const hideButton = (button: HTMLElement): void => {
 		if (button.hasAttribute('data-find-shares-hidden')) return;
-		
+
 		// Multiple hiding strategies to prevent React from resetting
 		button.style.setProperty('display', 'none', 'important');
 		button.style.setProperty('visibility', 'hidden', 'important');
@@ -63,7 +63,7 @@ const hideFindSharesButton = (): void => {
 		button.setAttribute('hidden', 'true');
 		button.setAttribute('aria-hidden', 'true');
 		button.setAttribute('data-find-shares-hidden', 'true');
-		
+
 		// Remove from DOM completely
 		try {
 			button.remove();
@@ -75,7 +75,7 @@ const hideFindSharesButton = (): void => {
 	// Strategy 1: Find by button text (case-insensitive, flexible matching)
 	const buttons = document.querySelectorAll('button');
 	buttons.forEach((button) => {
-		const textContent = button.textContent;
+		const { textContent } = button;
 		if (matchesFindShares(textContent)) {
 			hideButton(button);
 		}
@@ -84,7 +84,7 @@ const hideFindSharesButton = (): void => {
 	// Strategy 2: Find by inner elements text content and hide parent button
 	const allElements = document.querySelectorAll('div, span, p');
 	allElements.forEach((element) => {
-		const textContent = element.textContent;
+		const { textContent } = element;
 		if (matchesFindShares(textContent)) {
 			const button = element.closest('button');
 			if (button) {
@@ -92,7 +92,7 @@ const hideFindSharesButton = (): void => {
 			}
 			// Also hide parent containers that only contain this button
 			const parent = element.closest('div[class*="Container"]');
-			if (parent) {
+			if (parent && parent instanceof HTMLElement) {
 				const buttonsInParent = parent.querySelectorAll('button:not([data-find-shares-hidden])');
 				if (buttonsInParent.length <= 1) {
 					parent.style.setProperty('display', 'none', 'important');
@@ -103,12 +103,16 @@ const hideFindSharesButton = (): void => {
 	});
 
 	// Strategy 3: Find by data-testid or other attributes
-	const testButtons = document.querySelectorAll('button[data-testid*="share"], button[data-testid*="Share"], button[aria-label*="share" i], button[aria-label*="Share"]');
+	const testButtons = document.querySelectorAll(
+		'button[data-testid*="share"], button[data-testid*="Share"], button[aria-label*="share" i], button[aria-label*="Share"]'
+	);
 	testButtons.forEach((button) => {
-		const textContent = button.textContent;
-		const ariaLabel = button.getAttribute('aria-label');
-		if (matchesFindShares(textContent) || matchesFindShares(ariaLabel)) {
-			hideButton(button);
+		if (button instanceof HTMLElement) {
+			const { textContent } = button;
+			const ariaLabel = button.getAttribute('aria-label');
+			if (matchesFindShares(textContent) || matchesFindShares(ariaLabel)) {
+				hideButton(button);
+			}
 		}
 	});
 };
@@ -158,7 +162,7 @@ const setupFindSharesButtonHider = (): void => {
 	let checkCount = 0;
 	const aggressiveInterval = setInterval(() => {
 		hideFindSharesButton();
-		checkCount++;
+		checkCount += 1;
 		if (checkCount > 100) {
 			clearInterval(aggressiveInterval);
 			// Switch to less frequent checks
