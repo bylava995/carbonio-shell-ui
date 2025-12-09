@@ -44,3 +44,15 @@ body {
 		background: #e5e5e5;
 	}
 }
+
+/* Hide "Find shares" button - CSS backup strategy */
+button[data-find-shares-hidden="true"] {
+	display: none !important;
+	visibility: hidden !important;
+	opacity: 0 !important;
+	height: 0 !important;
+	width: 0 !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	pointer-events: none !important;
+}
