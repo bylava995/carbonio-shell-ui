@@ -14,7 +14,7 @@ import { useUtilityViews } from './utils';
 import { AppContextProvider } from '../boot/app/app-context-provider';
 
 const Panel = styled(Container)<{ $mode: string }>`
-	width: ${({ $mode }): number => ($mode !== 'closed' ? 16 : 3)}rem;
+	width: 100%;
 	border-radius: 0;
 	height: 100%;
 	position: absolute;
@@ -26,7 +26,8 @@ const Panel = styled(Container)<{ $mode: string }>`
 `;
 const Spacer = styled.div<{ $mode: string }>`
 	position: relative;
-	width: ${({ $mode }): number => ($mode === 'open' ? 16 : 3)}rem;
+	width: 50%;
+	flex-shrink: 0;
 	height: 100%;
 	transition: width 0.2s;
 `;

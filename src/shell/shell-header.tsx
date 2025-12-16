@@ -53,7 +53,7 @@ const ShellHeader = ({ children }: ShellHeaderProps): React.JSX.Element => {
 					orientation="horizontal"
 					mainAlignment="flex-start"
 					minWidth="fit-content"
-					data-testid="HeaderMainLogoContainer"
+					data-testid="HeaderMainLogoContainer"					
 				>
 					<Container width="15.625rem" height="2rem" crossAlignment="flex-start">
 						{darkReaderStatus && <StyledLogo />}
@@ -61,7 +61,11 @@ const ShellHeader = ({ children }: ShellHeaderProps): React.JSX.Element => {
 					<Padding horizontal="large">
 						<CreationButton />
 					</Padding>
-					{isSearchBarAvailable && <SearchBar />}
+					{isSearchBarAvailable && (
+						<Container width="50%" mainAlignment="flex-start" crossAlignment="flex-start">
+							<SearchBar />
+						</Container>
+					)}
 				</Container>
 				<Container
 					orientation="horizontal"
