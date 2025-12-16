@@ -53,7 +53,7 @@ const ShellHeader = ({ children }: ShellHeaderProps): React.JSX.Element => {
 					orientation="horizontal"
 					mainAlignment="flex-start"
 					minWidth="fit-content"
-					data-testid="HeaderMainLogoContainer"					
+					data-testid="HeaderMainLogoContainer"
 				>
 					<Container width="15.625rem" height="2rem" crossAlignment="flex-start">
 						{darkReaderStatus && <StyledLogo />}
