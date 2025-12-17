@@ -24,8 +24,9 @@ function noop(): void {
 	return undefined;
 }
 
-const PrimaryBarContainer = styled(Container)`
-	border-right: 0.0625rem solid ${({ theme }): string => theme.palette.gray3.regular};
+const PrimaryBarContainer = styled(Container)<{ $isHorizontal?: boolean }>`
+	${({ $isHorizontal, theme }): string =>
+		!$isHorizontal ? `border-right: 0.0625rem solid ${theme.palette.gray3.regular};` : ''}
 	z-index: ${BOARD_CONTAINER_ZINDEX + 1};
 `;
 
@@ -96,7 +97,12 @@ const OverlayRow = styled(Row)`
 	overflow-y: overlay;
 `;
 
-const ShellPrimaryBar = (): React.JSX.Element | null => {
+interface ShellPrimaryBarProps {
+	orientation?: 'vertical' | 'horizontal';
+}
+
+const ShellPrimaryBar = (props: ShellPrimaryBarProps = {}): React.JSX.Element | null => {
+	const { orientation = 'vertical' } = props;
 	const activeRoute = useCurrentRoute();
 	const primaryBarViews = useAppStore((s) => s.views.primaryBar);
 	const navigate = useNavigate();
@@ -165,12 +171,15 @@ const ShellPrimaryBar = (): React.JSX.Element | null => {
 		[accessoryViews]
 	);
 
+	const isHorizontal = orientation === 'horizontal';
+	
 	return (
 		<PrimaryBarContainer
-			width={PRIMARY_BAR_WIDTH}
-			height="fill"
+			$isHorizontal={isHorizontal}
+			width={isHorizontal ? 'auto' : PRIMARY_BAR_WIDTH}
+			height={isHorizontal ? 'auto' : 'fill'}
 			background={'gray6'}
-			orientation="vertical"
+			orientation={orientation}
 			mainAlignment="flex-start"
 			crossAlignment="flex-start"
 			data-testid="SideMenuContainer"
@@ -178,14 +187,14 @@ const ShellPrimaryBar = (): React.JSX.Element | null => {
 			<OverlayRow
 				mainAlignment="flex-start"
 				crossAlignment="flex-start"
-				orientation="vertical"
-				takeAvailableSpace
+				orientation={orientation}
+				takeAvailableSpace={!isHorizontal}
 				wrap="nowrap"
 			>
 				{primaryBarItems}
 				<ToggleBoardIcon />
 			</OverlayRow>
-			<OverlayRow mainAlignment="flex-end" orientation="vertical" wrap="nowrap">
+			<OverlayRow mainAlignment={isHorizontal ? 'flex-start' : 'flex-end'} orientation={orientation} wrap="nowrap">
 				{accessoryItems}
 			</OverlayRow>
 		</PrimaryBarContainer>

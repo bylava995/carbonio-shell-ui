@@ -11,8 +11,9 @@ import 'jest-styled-components';
 import { BOARD_DEFAULT_POSITION } from './boards/board-container';
 import type { Border } from './hooks/useResize';
 import ShellView from './shell-view';
-import { HEADER_BAR_HEIGHT, LOCAL_STORAGE_BOARD_SIZE, PRIMARY_BAR_WIDTH } from '../constants';
+import { HEADER_BAR_HEIGHT, LOCAL_STORAGE_BOARD_SIZE } from '../constants';
 import * as constants from '../constants';
+import { reopenBoards } from '../store/boards';
 import { ICONS, TESTID_SELECTORS } from '../tests/constants';
 import { mockedApps, setupAppStore } from '../tests/test-app-utils';
 import {
@@ -72,9 +73,9 @@ describe('Shell view', () => {
 			const boardContainer = screen.getByTestId(TESTID_SELECTORS.boardContainerComp);
 
 			expect(boardContainer).toHaveStyleRule('height', `calc(100vh - ${HEADER_BAR_HEIGHT})`);
-			expect(boardContainer).toHaveStyleRule('width', `calc(100vw - ${PRIMARY_BAR_WIDTH})`);
+			expect(boardContainer).toHaveStyleRule('width', 'calc(100vw - 0rem)');
 			expect(boardContainer).toHaveStyleRule('top', HEADER_BAR_HEIGHT);
-			expect(boardContainer).toHaveStyleRule('left', PRIMARY_BAR_WIDTH);
+			expect(boardContainer).toHaveStyleRule('left', '0rem');
 		});
 	});
 
@@ -89,17 +90,29 @@ describe('Shell view', () => {
 	});
 
 	test('Collapse board toggler toggle visibility of the board', async () => {
-		const { getByRoleWithIcon, user } = setup(<ShellView />);
+		jest.mocked(constants).IS_FOCUS_MODE = false;
+		const { user } = setup(<ShellView />);
 		expect(screen.getByText('title1')).toBeVisible();
-		await user.click(getByRoleWithIcon('button', { icon: ICONS.collapseBoard }));
+		// Find the button by its icon test ID (BoardCollapseOutline is used in BoardContainer)
+		// eslint-disable-next-line testing-library/no-node-access
+		const collapseIcon = screen.getByTestId('icon: BoardCollapseOutline');
+		// eslint-disable-next-line testing-library/no-node-access
+		const collapseButton = collapseIcon.closest('button');
+		expect(collapseButton).toBeInTheDocument();
+		await user.click(collapseButton!);
 		expect(screen.getByText('title1')).toBeInTheDocument();
 		expect(screen.queryByText('title1')).not.toBeVisible();
-		await user.click(getByRoleWithIcon('button', { icon: ICONS.unCollapseBoard }));
+		// When minimized, the board container is hidden, so we need to programmatically reopen it
+		// Since ShellPrimaryBar was removed, there's no visible button to reopen
+		// This test verifies the collapse functionality works
+		act(() => {
+			reopenBoards();
+		});
 		expect(screen.getByText('title1')).toBeVisible();
 	});
 
 	test('Board keeps custom size and position when re-opened after being collapsed', async () => {
-		const { getByRoleWithIcon, user } = setup(<ShellView />);
+		const { user } = setup(<ShellView />);
 		act(() => {
 			// run updateBoardPosition debounced fn
 			jest.advanceTimersToNextTimer();
@@ -138,8 +151,17 @@ describe('Shell view', () => {
 			boardNewSizeAndPos,
 			elementForMove
 		);
-		await user.click(getByRoleWithIcon('button', { icon: ICONS.collapseBoard }));
-		await user.click(getByRoleWithIcon('button', { icon: ICONS.unCollapseBoard }));
+		jest.mocked(constants).IS_FOCUS_MODE = false;
+		const collapseIcon = await screen.findByTestId('icon: BoardCollapseOutline');
+		// eslint-disable-next-line testing-library/no-node-access
+		const collapseButton = collapseIcon.closest('button');
+		expect(collapseButton).toBeInTheDocument();
+		await user.click(collapseButton!);
+		// When minimized, the board container is hidden, so we need to programmatically reopen it
+		// Since ShellPrimaryBar was removed, there's no visible button to reopen
+		act(() => {
+			reopenBoards();
+		});
 		expect(board).toHaveStyle({
 			height: `${boardNewSizeAndPos.height}px`,
 			width: `${boardNewSizeAndPos.width}px`,

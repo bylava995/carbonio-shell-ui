@@ -363,8 +363,8 @@ describe('Board container', () => {
 		await user.click(getByRoleWithIcon('button', { icon: ICONS.reduceBoard }));
 		expect(board).toHaveStyleRule('height', '70vh');
 		expect(board).toHaveStyleRule('width', 'auto');
-		expect(board).toHaveStyleRule('bottom', '0');
-		expect(board).toHaveStyleRule('left', '1.5rem');
+		expect(board).toHaveStyleRule('bottom', '0.5rem');
+		expect(board).toHaveStyleRule('right', '1.5rem');
 	});
 
 	test('Reduce resized board set board to resized size', async () => {

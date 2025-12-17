@@ -13,10 +13,9 @@ import styled from 'styled-components';
 import AppViewContainer from './app-view-container';
 import { BoardContainer } from './boards/board-container';
 import ShellHeader from './shell-header';
-import ShellPrimaryBar from './shell-primary-bar';
 import ShellSecondaryBar from './shell-secondary-bar';
 import { ThemeCallbacksContext } from '../boot/theme-provider';
-import { HEADER_BAR_HEIGHT, IS_FOCUS_MODE, PRIMARY_BAR_WIDTH } from '../constants';
+import { HEADER_BAR_HEIGHT, IS_FOCUS_MODE } from '../constants';
 import { useDarkReaderResultValue } from '../dark-mode/use-dark-reader-result-value';
 import { ShellUtilityBar } from '../utility-bar/bar';
 import { ShellUtilityPanel } from '../utility-bar/panel';
@@ -31,6 +30,21 @@ const Background = styled.div`
 	width: 100%;
 	min-width: ${IS_FOCUS_MODE ? '100%' : '60rem'};
 	max-width: 100%;
+`;
+
+const MainContentContainer = styled.div`
+	display: flex;
+	flex: 1;
+	min-width: 0;
+	width: 100%;
+	height: 100%;
+`;
+
+const PanelContainer = styled.div`
+	width: 50%;
+	flex-shrink: 0;
+	height: 100%;
+	min-width: 0;
 `;
 
 function DarkReaderListener(): null {
@@ -62,15 +76,20 @@ const ShellComponent = (): React.JSX.Element => (
 					mainAlignment="flex-start"
 					crossAlignment="flex-start"
 				>
-					<ShellPrimaryBar />
 					<ShellSecondaryBar />
 				</Container>
 			)}
-			<AppViewContainer />
-			<ShellUtilityPanel />
+			<MainContentContainer>
+				<PanelContainer>
+					<AppViewContainer />
+				</PanelContainer>
+				<PanelContainer>
+					<ShellUtilityPanel />
+				</PanelContainer>
+			</MainContentContainer>
 		</Row>
 		<BoardContainer
-			leftOffset={IS_FOCUS_MODE ? '0rem' : PRIMARY_BAR_WIDTH}
+			leftOffset="0rem"
 			topOffset={IS_FOCUS_MODE ? '0rem' : HEADER_BAR_HEIGHT}
 			minimizeAllowed={!IS_FOCUS_MODE}
 		/>

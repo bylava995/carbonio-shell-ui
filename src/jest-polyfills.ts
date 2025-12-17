@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+/* eslint-disable max-classes-per-file */
 import { noop } from 'lodash';
 import { createHash } from 'node:crypto';
 
@@ -70,3 +71,27 @@ Object.defineProperty(window.crypto, 'randomUUID', {
 	writable: true,
 	value: jest.fn(() => Math.random().toString())
 });
+
+// Polyfills for SVG elements which are not available in jsdom
+// These are needed for darkreader library in test environments
+// SVGElement may not exist in jsdom, so we use Element as fallback
+const BaseSVGElement = (global.SVGElement as typeof Element | undefined) || Element;
+
+if (typeof global.SVGStyleElement === 'undefined') {
+	global.SVGStyleElement =
+		class SVGStyleElement extends BaseSVGElement {} as typeof SVGStyleElement;
+}
+
+if (typeof global.SVGTextElement === 'undefined') {
+	global.SVGTextElement = class SVGTextElement extends BaseSVGElement {} as typeof SVGTextElement;
+}
+
+// Polyfill for CSSSupportsRule which is not available in jsdom
+// This is needed for darkreader library in test environments
+if (typeof global.CSSSupportsRule === 'undefined') {
+	const BaseCSSRule = (global.CSSRule as unknown as typeof Object) || Object;
+	// eslint-disable-next-line no-useless-constructor
+	global.CSSSupportsRule =
+		class CSSSupportsRule extends BaseCSSRule {} as unknown as typeof CSSSupportsRule;
+}
+/* eslint-enable max-classes-per-file */
