@@ -12,6 +12,7 @@ import styled from 'styled-components';
 
 import { CreationButton } from './creation-button';
 import { Logo } from './logo';
+import ShellPrimaryBar from './shell-primary-bar';
 import { BOARD_CONTAINER_ZINDEX, HEADER_BAR_HEIGHT } from '../constants';
 import { useDarkMode } from '../dark-mode/use-dark-mode';
 import { useIntegratedComponent } from '../store/integrations/hooks';
@@ -66,6 +67,7 @@ const ShellHeader = ({ children }: ShellHeaderProps): React.JSX.Element => {
 							<SearchBar />
 						</Container>
 					)}
+					<ShellPrimaryBar orientation="horizontal" />
 				</Container>
 				<Container
 					orientation="horizontal"

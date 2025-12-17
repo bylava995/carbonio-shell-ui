@@ -146,7 +146,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps): React.JSX.Eleme
 		}));
 	}, [primaryColor]);
 
-	const [darkReaderState, setDarkReaderState] = useState<DarkReaderPropValues>('disabled');
+	const [darkReaderState, setDarkReaderState] = useState<DarkReaderPropValues>('enabled');
 
 	useEffect(() => {
 		switch (darkReaderState) {

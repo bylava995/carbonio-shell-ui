@@ -172,13 +172,13 @@ const ShellPrimaryBar = (props: ShellPrimaryBarProps = {}): React.JSX.Element | 
 	);
 
 	const isHorizontal = orientation === 'horizontal';
-	
+
 	return (
 		<PrimaryBarContainer
 			$isHorizontal={isHorizontal}
 			width={isHorizontal ? 'auto' : PRIMARY_BAR_WIDTH}
 			height={isHorizontal ? 'auto' : 'fill'}
-			background={'gray6'}
+			background={'none'}
 			orientation={orientation}
 			mainAlignment="flex-start"
 			crossAlignment="flex-start"
@@ -194,7 +194,11 @@ const ShellPrimaryBar = (props: ShellPrimaryBarProps = {}): React.JSX.Element | 
 				{primaryBarItems}
 				<ToggleBoardIcon />
 			</OverlayRow>
-			<OverlayRow mainAlignment={isHorizontal ? 'flex-start' : 'flex-end'} orientation={orientation} wrap="nowrap">
+			<OverlayRow
+				mainAlignment={isHorizontal ? 'flex-start' : 'flex-end'}
+				orientation={orientation}
+				wrap="nowrap"
+			>
 				{accessoryItems}
 			</OverlayRow>
 		</PrimaryBarContainer>

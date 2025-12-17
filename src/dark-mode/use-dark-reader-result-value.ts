@@ -35,9 +35,9 @@ export function useDarkReaderResultValue(): undefined | DarkReaderPropValues {
 	return useMemo(() => {
 		if (settingReceived) {
 			return (
-				settings.prefs.carbonioPrefDarkMode || (carbonioWebUiDarkMode && 'enabled') || 'disabled'
+				settings.prefs.carbonioPrefDarkMode || (carbonioWebUiDarkMode && 'enabled') || 'enabled'
 			);
 		}
-		return undefined;
+		return 'enabled';
 	}, [settingReceived, settings, carbonioWebUiDarkMode]);
 }

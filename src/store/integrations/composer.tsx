@@ -8,7 +8,7 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import type { IAllProps as EditorProps } from '@tinymce/tinymce-react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Container } from '@zextras/carbonio-design-system';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import type { EditorOptions, TinyMCE, Ui } from 'tinymce/tinymce';
 // TinyMCE so the global var exists
 import tinymce from 'tinymce/tinymce';
@@ -43,6 +43,7 @@ import 'tinymce/plugins/wordcount';
 
 import { SUPPORTED_LOCALES } from '../../constants/locales';
 import { useUserSettings } from '../account';
+import { useBoardStore } from '../boards';
 import { getT } from '../i18n/hooks';
 import { useI18nStore } from '../i18n/store';
 
@@ -65,6 +66,25 @@ type ComposerProps = EditorProps & {
 
 export const FileInput = styled.input`
 	display: none;
+`;
+
+const EditorWrapper = styled.div<{ $expanded?: boolean }>`
+	${({ $expanded }): ReturnType<typeof css> | false =>
+		$expanded === true
+			? css`
+					flex: 1;
+					display: flex;
+					flex-direction: column;
+					min-height: 0;
+					overflow: hidden;
+					& > .tox-tinymce {
+						flex: 1;
+						display: flex;
+						flex-direction: column;
+						min-height: 0;
+					}
+				`
+			: false}
 `;
 
 const Composer = ({
@@ -98,6 +118,7 @@ const Composer = ({
 		[prefs]
 	);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
 	const onFileClick = useCallback(() => {
 		if (inputRef.current) {
 			inputRef.current.value = '';
@@ -106,14 +127,21 @@ const Composer = ({
 	}, []);
 	const t = getT();
 	const { locale } = useI18nStore.getState();
+	const expanded = useBoardStore((s) => s.expanded);
 	const language = useMemo(() => {
+		if (!locale) {
+			return 'en';
+		}
+		// Normalize locale variants (e.g., en_US -> en, en-US -> en)
+		const normalizedLocale = locale.replace(/[-_].*$/, '');
 		const localeObj =
-			locale in SUPPORTED_LOCALES && SUPPORTED_LOCALES[locale as keyof typeof SUPPORTED_LOCALES];
-		return (
-			(localeObj &&
-				(('tinymceLocale' in localeObj && localeObj?.tinymceLocale) || localeObj?.value)) ||
-			locale
-		);
+			normalizedLocale in SUPPORTED_LOCALES &&
+			SUPPORTED_LOCALES[normalizedLocale as keyof typeof SUPPORTED_LOCALES];
+		if (localeObj) {
+			return ('tinymceLocale' in localeObj && localeObj?.tinymceLocale) || localeObj?.value || 'en';
+		}
+		// Fallback to 'en' if locale not found in supported locales
+		return 'en';
 	}, [locale]);
 	const inlineLabel = useMemo(() => t('label.add_inline_image', 'Add inline image'), [t]);
 
@@ -143,7 +171,7 @@ const Composer = ({
 	const editorInitConfig = useMemo<EditorProps['init']>(
 		() => ({
 			content_css: `${BASE_PATH}/tinymce/skins/content/default/content.css`,
-			language_url: `${BASE_PATH}tinymce/langs/${language}.js`,
+			...(language !== 'en' && { language_url: `${BASE_PATH}tinymce/langs/${language}.js` }),
 			language,
 			setup: setupCallback,
 			min_height: 350,
@@ -207,7 +235,7 @@ const Composer = ({
 				'help',
 				'quickbars',
 				'directionality',
-				'autoresize',
+				...(expanded ? [] : ['autoresize']),
 				'visualblocks'
 			],
 			toolbar: inline
@@ -230,7 +258,7 @@ const Composer = ({
 				: 'link',
 			contextmenu: '',
 			toolbar_mode: 'wrap',
-			content_style: `body  {  color: ${defaultStyle?.color}; font-size: ${defaultStyle?.fontSize}; font-family: ${defaultStyle?.font}; }`,
+			content_style: `body  {  color: ${defaultStyle?.color}; font-size: ${defaultStyle?.fontSize}; font-family: ${defaultStyle?.font}; margin-bottom: 0 !important; padding-bottom: 0 !important; }`,
 			visualblocks_default_state: false,
 			end_container_on_empty_block: true,
 			relative_urls: false,
@@ -247,7 +275,8 @@ const Composer = ({
 			defaultStyle?.color,
 			defaultStyle?.fontSize,
 			defaultStyle?.font,
-			customInitOptions
+			customInitOptions,
+			expanded
 		]
 	);
 
@@ -257,10 +286,17 @@ const Composer = ({
 
 	return (
 		<Container
-			height="100%"
+			ref={containerRef}
+			height={expanded ? 'calc(100vh)' : undefined}
 			crossAlignment="baseline"
 			mainAlignment="flex-start"
-			style={{ overflowY: 'hidden' }}
+			style={{
+				overflowY: 'hidden',
+				display: 'flex',
+				flexDirection: 'column',
+				...(expanded && { flex: 1, minHeight: 0 }),
+				...(expanded && { position: 'relative' })
+			}}
 		>
 			<FileInput
 				type="file"
@@ -270,13 +306,21 @@ const Composer = ({
 				multiple
 			/>
 
-			<Editor
-				initialValue={initialValue}
-				value={value}
-				init={editorInitConfig}
-				onEditorChange={isControlledMode ? _onEditorChange : undefined}
-				{...rest}
-			/>
+			<EditorWrapper $expanded={expanded}>
+				<Editor
+					initialValue={initialValue}
+					value={value}
+					init={{
+						...editorInitConfig,
+						min_height: expanded ? undefined : 350,
+						height: expanded ? '100%' : undefined,
+						autoresize_bottom_margin: expanded ? 0 : undefined,
+						autoresize_overflow_padding: expanded ? 0 : undefined
+					}}
+					onEditorChange={isControlledMode ? _onEditorChange : undefined}
+					{...rest}
+				/>
+			</EditorWrapper>
 		</Container>
 	);
 };

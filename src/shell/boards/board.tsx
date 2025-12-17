@@ -8,7 +8,7 @@ import React, { useMemo } from 'react';
 
 import { Container } from '@zextras/carbonio-design-system';
 import { find } from 'lodash';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AppContextProvider } from '../../boot/app/app-context-provider';
 import { useAppStore } from '../../store/app';
@@ -16,11 +16,19 @@ import { BoardProvider, useBoardStore } from '../../store/boards';
 import type { BoardView } from '../../types/apps';
 import type { Board } from '../../types/boards';
 
-const BoardContainer = styled.div<{ $show: boolean }>`
-	display: ${({ $show }): string => ($show ? 'block' : 'none')};
+const BoardContainer = styled.div<{ $show: boolean; $expanded?: boolean }>`
+	display: ${({ $show }): string => ($show ? 'flex' : 'none')};
+	flex-direction: column;
 	height: 100%;
 	width: 100%;
-	overflow-y: auto;
+	overflow-y: ${({ $expanded }): string => ($expanded ? 'hidden' : 'auto')};
+	${({ $expanded }): ReturnType<typeof css> | false =>
+		$expanded === true
+			? css`
+					flex: 1;
+					min-height: 0;
+				`
+			: false}
 	&::-webkit-scrollbar {
 		width: 0.5rem;
 	}
@@ -51,6 +59,7 @@ const BoardViewComponent = ({
 
 export const AppBoard = ({ board }: { board: Board }): React.JSX.Element => {
 	const current = useBoardStore((s) => s.current);
+	const expanded = useBoardStore((s) => s.expanded);
 	const boardViews = useAppStore((s) => s.views.board);
 	const boardView = useMemo(
 		() => find(boardViews, (v) => v.id === board.boardViewId),
@@ -58,7 +67,7 @@ export const AppBoard = ({ board }: { board: Board }): React.JSX.Element => {
 	);
 
 	return (
-		<BoardContainer $show={current === board.id}>
+		<BoardContainer $show={current === board.id} $expanded={expanded}>
 			{boardView ? (
 				<BoardViewComponent view={boardView} boardId={board.id} />
 			) : (

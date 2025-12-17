@@ -52,8 +52,8 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useMove } from '../hooks/useMove';
 
 export const BOARD_DEFAULT_POSITION: Pick<CSSProperties, 'top' | 'left' | 'right' | 'bottom'> = {
-	left: '1.5rem',
-	bottom: '0'
+	right: '1.5rem',
+	bottom: '0.5rem'
 };
 
 const BoardContainerComp = styled.div<{
@@ -135,8 +135,18 @@ const BoardHeader = styled(Row)`
 	position: relative;
 `;
 
-const BoardDetailContainer = styled(Row)`
+const BoardDetailContainer = styled(Row)<{ $expanded?: boolean }>`
 	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	${({ $expanded }): ReturnType<typeof css> | false =>
+		$expanded === true
+			? css`
+					flex: 1;
+					min-height: 0;
+					overflow: hidden;
+				`
+			: false}
 `;
 const BackButton = styled(IconButton)``;
 const Actions = styled(Row)``;
@@ -471,7 +481,7 @@ export const BoardContainer = ({
 							</Actions>
 						</BoardHeader>
 						<Divider style={{ height: '0.125rem' }} />
-						<BoardDetailContainer takeAvailableSpace>
+						<BoardDetailContainer $expanded={expanded} takeAvailableSpace>
 							{map(boards, (b) => (
 								<AppBoard key={b.id} board={b} />
 							))}

@@ -32,21 +32,6 @@ const Background = styled.div`
 	max-width: 100%;
 `;
 
-const MainContentContainer = styled.div`
-	display: flex;
-	flex: 1;
-	min-width: 0;
-	width: 100%;
-	height: 100%;
-`;
-
-const PanelContainer = styled.div`
-	width: 50%;
-	flex-shrink: 0;
-	height: 100%;
-	min-width: 0;
-`;
-
 function DarkReaderListener(): null {
 	const { setDarkReaderState } = useContext(ThemeCallbacksContext);
 	const darkReaderResultValue = useDarkReaderResultValue();
@@ -79,14 +64,8 @@ const ShellComponent = (): React.JSX.Element => (
 					<ShellSecondaryBar />
 				</Container>
 			)}
-			<MainContentContainer>
-				<PanelContainer>
-					<AppViewContainer />
-				</PanelContainer>
-				<PanelContainer>
-					<ShellUtilityPanel />
-				</PanelContainer>
-			</MainContentContainer>
+			<AppViewContainer />
+			<ShellUtilityPanel />
 		</Row>
 		<BoardContainer
 			leftOffset="0rem"
