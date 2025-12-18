@@ -20,6 +20,17 @@ export type LocaleDescriptor = {
 	tinymceLocale?: string;
 };
 export const SUPPORTED_LOCALES: Record<string, LocaleDescriptor> = {
+	ar: {
+		name: 'العربية',
+		value: 'ar',
+		tinymceLocale: 'ar',
+		dateFnsLocale: {
+			localeImportPath: () =>
+				/* webpackMode: "lazy", webpackChunkName: "ar" */ import('date-fns/locale/ar').then(
+					({ ar }) => ar
+				)
+		}
+	},
 	zh_CN: {
 		name: '中文 (中国)',
 		value: 'zh_CN',
@@ -233,6 +244,15 @@ export type LocaleDescriptorWithLabels = LocaleDescriptor & {
 	localName: string;
 };
 export const localeList = (t: TFunction): Array<LocaleDescriptorWithLabels> => [
+	{
+		id: 'ar',
+		...SUPPORTED_LOCALES.ar,
+		localName: t('locale.arabic', 'Arabic'),
+		label: t('locale.label_arabic', {
+			value: SUPPORTED_LOCALES.ar.name,
+			defaultValue: 'Arabic - {{value}}'
+		})
+	},
 	{
 		id: 'zh_CN',
 		...SUPPORTED_LOCALES.zh_CN,

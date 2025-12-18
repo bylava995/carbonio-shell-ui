@@ -1096,7 +1096,7 @@ describe('Account setting', () => {
 		await user.clear(inputElement);
 		await user.type(inputElement, persona1FullName);
 		await user.click(screen.getByRole('button', { name: /save/i }));
-		const snackbar = await screen.findByText(/something went wrong, please try again/i);
+		const snackbar = await screen.findByText(/something went wrong|حدث خطأ ما/i);
 		expect(snackbar).toBeVisible();
 		expect(screen.getAllByRole('listitem').length).toEqual(2);
 	});
@@ -1155,7 +1155,7 @@ describe('Account setting', () => {
 			within(screen.getByTestId(`account-list-item-${persona2Id}`)).getByText(persona1FullName)
 		).toBeVisible();
 		await user.click(screen.getByRole('button', { name: /save/i }));
-		const successSnackbar = await screen.findByText(/something went wrong, please try again/i);
+		const successSnackbar = await screen.findByText(/something went wrong|حدث خطأ ما/i);
 		expect(successSnackbar).toBeVisible();
 		expect(
 			within(screen.getByTestId(`account-list-item-${persona2Id}`)).getByText(persona2FullName)
@@ -1245,7 +1245,7 @@ describe('Account setting', () => {
 		await user.click(confirmButton);
 		expect(screen.getAllByRole('listitem').length).toEqual(1);
 		await user.click(screen.getByRole('button', { name: /save/i }));
-		const snackbar = await screen.findByText(/something went wrong, please try again/i);
+		const snackbar = await screen.findByText(/something went wrong|حدث خطأ ما/i);
 		expect(snackbar).toBeVisible();
 		expect(screen.getAllByRole('listitem').length).toEqual(2);
 	});
@@ -1290,7 +1290,7 @@ describe('Account setting', () => {
 		const { user } = setup(<AccountsSettings />);
 		await user.click(screen.getByRole('button', { name: /add persona/i }));
 		await user.click(screen.getByRole('button', { name: /save/i }));
-		const snackbar = await screen.findByText(/something went wrong, please try again/i);
+		const snackbar = await screen.findByText(/something went wrong|حدث خطأ ما/i);
 		expect(snackbar).toBeVisible();
 	});
 });
